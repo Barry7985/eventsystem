@@ -4,29 +4,33 @@
 {% block title %}{{ event.title }}{% endblock %}
 
 {% block content %}
-<div class="container mt-5">
-    <div class="row">
+<div class="container container-main mt-5">
+    <div class="row animate fadeInUp">
         <div class="col-lg-8">
-            <div class="card shadow-lg">
+            <div class="event-detail-card shadow-lg">
                 {% if event.image %}
-                    <img src="{{ event.image.url }}" class="card-img-top" alt="{{ event.title }}">
+                    <img src="{{ event.image.url }}" alt="{{ event.title }}" class="event-detail-img card-img-top">
                 {% else %}
-                    <img src="https://via.placeholder.com/800x400" class="card-img-top" alt="Image par défaut">
+                    <img src="https://via.placeholder.com/1200x600" alt="Image par défaut" class="event-detail-img card-img-top">
                 {% endif %}
                 <div class="card-body p-4">
-                    <h1 class="card-title">{{ event.title }}</h1>
-                    <p class="card-subtitle mb-3 text-muted">
-                        <i class="bi bi-calendar-event"></i> {{ event.start_date|date:"d F Y à H:i" }} - {{ event.end_date|date:"d F Y à H:i" }}
-                        <br>
-                        <i class="bi bi-geo-alt"></i> {{ event.location }}
-                        {% if event.category %}
-                            <br>
-                            <i class="bi bi-tags"></i> {{ event.category.name }}
-                        {% endif %}
-                    </p>
+                    <h2 class="card-title">{{ event.title }}</h2>
                     <p class="card-text">{{ event.description|linebreaksbr }}</p>
-
-                    <div class="d-flex justify-content-between align-items-center mt-4">
+                    <div class="d-flex mb-3">
+                        <div class="me-4">
+                            <i class="fas fa-calendar-day me-2"></i>
+                            <span>{{ event.start_date|date:"d F Y" }}</span>
+                        </div>
+                        <div>
+                            <i class="fas fa-clock me-2"></i>
+                            <span>{{ event.start_date|date:"H:i" }} - {{ event.end_date|date:"H:i" }}</span>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <i class="fas fa-map-marker-alt me-2"></i>
+                        <span>{{ event.location }}</span>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center">
                         <div>
                             {% if event.price > 0 %}
                                 <h4 class="mb-0">Prix: <span class="text-success">{{ event.price|intcomma }}</span></h4>
@@ -40,42 +44,86 @@
                                 {% if not user.ticket_set.filter(event=event).exists %}
                                     {% if event.capacity > event.ticket_set.count %}
                                         {% if event.price > 0 %}
-                                            <a href="{% url 'initiate_payment' event.id %}" class="btn btn-primary btn-lg">Acheter un billet</a>
+                                            <a href="{% url 'initiate_payment' event.id %}" class="btn btn-primary" aria-label="Acheter un billet">Acheter un billet</a>
                                         {% else %}
-                                            <a href="{% url 'event_register' event.id %}" class="btn btn-success btn-lg">S'inscrire</a>
+                                            <a href="{% url 'event_register' event.id %}" class="btn btn-success" aria-label="S'inscrire à l'événement">S'inscrire</a>
                                         {% endif %}
                                     {% else %}
-                                        <button class="btn btn-secondary btn-lg" disabled>Événement complet</button>
+                                        <button class="btn btn-secondary" disabled>Événement complet</button>
                                     {% endif %}
                                 {% else %}
-                                    <button class="btn btn-outline-success btn-lg" disabled>Déjà inscrit</button>
+                                    <button class="btn btn-outline-success" disabled>Déjà inscrit</button>
                                 {% endif %}
                             {% else %}
-                                <a href="{% url 'login' %}" class="btn btn-outline-primary btn-lg">Se connecter pour s'inscrire</a>
+                                <a href="{% url 'login' %}" class="btn btn-outline-primary" aria-label="Se connecter pour s'inscrire">Se connecter pour s'inscrire</a>
                             {% endif %}
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
-        <div class="col-lg-4 mt-4 mt-lg-0">
-            <div class="card shadow-sm">
-                <div class="card-body">
-                    <h5 class="card-title">Organisateur</h5>
-                    <div class="d-flex align-items-center">
-                        {% if event.organizer.profile_picture %}
-                            <img src="{{ event.organizer.profile_picture.url }}" alt="Photo de profil de {{ event.organizer.username }}" class="rounded-circle me-3" width="50" height="50">
-                        {% else %}
-                            <div class="bg-secondary rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 50px; height: 50px;">
-                                <span class="text-white fw-bold">{{ event.organizer.username|slice:":1|upper" }}</span>
-                            </div>
-                        {% endif %}
-                        <p class="mb-0">{{ event.organizer.first_name }} {{ event.organizer.last_name }} ({{ event.organizer.username }})</p>
+            <div class="animate fadeInUp delay-1 mt-4">
+                <h3 class="section-title">Programme</h3>
+                {% for session in event.sessions.all %}
+                <div class="schedule-item">
+                    <div class="schedule-time">{{ session.start_time|date:"H:i" }} - {{ session.end_time|date:"H:i" }}</div>
+                    <div class="schedule-content">
+                        <h5>{{ session.title }}</h5>
+                        <p>{{ session.description }}</p>
                     </div>
-                    <hr>
-                    <p class="card-text"><small class="text-muted">Cet événement est organisé par l'utilisateur ci-dessus.</small></p>
                 </div>
+                {% empty %}
+                <p>Le programme n'est pas encore défini.</p>
+                {% endfor %}
             </div>
+            <div class="animate fadeInUp delay-2 mt-4">
+                <h3 class="section-title">Avis des participants</h3>
+                {% for review in event.reviews.all %}
+                <div class="review-card">
+                    <div class="review-author">
+                        {% if review.user.profile.profile_picture %}
+                            <img src="{{ review.user.profile.profile_picture.url }}" alt="{{ review.user.get_full_name }}" class="review-avatar">
+                        {% else %}
+                            <img src="https://randomuser.me/api/portraits/{{ review.user.profile.gender|lower }}/{{ review.user.id }}.jpg" alt="{{ review.user.get_full_name }}" class="review-avatar">
+                        {% endif %}
+                        <div>
+                            <div class="review-name">{{ review.user.get_full_name }}</div>
+                            <div class="review-date">{{ review.created_at|date:"d F Y" }}</div>
+                        </div>
+                    </div>
+                    <p class="card-text">{{ review.comment }}</p>
+                </div>
+                {% empty %}
+                <p>Il n'y a pas encore d'avis pour cet événement.</p>
+                {% endfor %}
+            </div>
+        </div>
+        <div class="col-lg-4 animate fadeInUp delay-3 mt-4 mt-lg-0">
+            <div class="organizer-card shadow-sm">
+                {% if event.organizer.profile_picture %}
+                    <img src="{{ event.organizer.profile_picture.url }}" alt="{{ event.organizer.get_full_name }}" class="organizer-avatar mx-auto d-block rounded-circle">
+                {% else %}
+                    <div class="bg-secondary rounded-circle d-flex align-items-center justify-content-center mx-auto" style="width: 100px; height: 100px;">
+                        <span class="text-white fw-bold" style="font-size: 2em;">{{ event.organizer.first_name|slice:":1|upper }}{{ event.organizer.last_name|slice:":1|upper" }}</span>
+                    </div>
+                {% endif %}
+                <h4 class="organizer-name text-center mt-3">{{ event.organizer.get_full_name }}</h4>
+                <p class="organizer-title text-center text-muted">Organisateur principal</p>
+                <p class="text-center">{{ event.organizer.profile.bio|default:"Aucune biographie disponible." }}</p>
+            </div>
+            <div class="mt-4">
+                <h4 class="section-title">Informations pratiques</h4>
+                <ul class="list-unstyled">
+                    <li class="mb-2"><i class="fas fa-map-marker-alt me-2"></i> Adresse : {{ event.address }}</li>
+                    <li class="mb-2"><i class="fas fa-phone me-2"></i> Contact : {{ event.contact_phone|default:"Non renseigné" }}</li>
+                    <li><i class="fas fa-envelope me-2"></i> Email : {{ event.contact_email|default:"Non renseigné" }}</li>
+                </ul>
+            </div>
+            {% if event.website %}
+            <div class="mt-4">
+                <h4 class="section-title">Site web</h4>
+                <p><a href="{{ event.website }}" target="_blank" rel="noopener noreferrer"><i class="fas fa-globe me-2"></i> {{ event.website }}</a></p>
+            </div>
+            {% endif %}
         </div>
     </div>
 </div>

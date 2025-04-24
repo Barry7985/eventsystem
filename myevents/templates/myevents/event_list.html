@@ -1,23 +1,41 @@
-{% extends 'base.html' %}
+{% extends 'myevents/base.html' %}
 
 {% block title %}Liste des Événements{% endblock %}
 
 {% block content %}
-    <h1>Événements Disponibles</h1>
     <div class="row row-cols-1 row-cols-md-3 g-4">
         {% for event in event_list %}
-            <div class="col">
-                <div class="card h-100">
-                    {% if event.image %}
-                        <img src="{{ event.image.url }}" class="card-img-top" alt="{{ event.title }}">
-                    {% else %}
-                        <img src="https://via.placeholder.com/300x200" class="card-img-top" alt="Image par défaut">
-                    {% endif %}
+            <div class="col-lg-4 col-md-6 animate fadeInUp delay-2">
+                <div class="event-card">
+                    <div class="card-img-container">
+                        {% if event.image %}
+                            <img src="{{ event.image.url }}" class="card-img-top" alt="{{ event.title }}" loading="lazy">
+                        {% else %}
+                            <img src="https://images.unsplash.com/photo-1505373877841-8d25f7d46678?ixlib=rb-1.2.1&auto=format&fit=crop&w=600&q=80" class="card-img-top" alt="Conférence sur l'innovation" loading="lazy">
+                        {% endif %}
+                        <div class="card-badge">
+                            <i class="fas fa-calendar-day me-1"></i> {{ event.start_date|date:"d F" }}
+                        </div>
+                    </div>
                     <div class="card-body">
-                        <h5 class="card-title">{{ event.title }}</h5>
+                        {% if event.is_available %}
+                            <span class="badge bg-success mb-2">Disponible</span>
+                        {% else %}
+                            <span class="badge bg-danger mb-2">Indisponible</span>
+                        {% endif %}
+                        <h3 class="card-title">{{ event.title }}</h3>
                         <p class="card-text">{{ event.description|truncatechars:100 }}</p>
-                        <p class="card-text"><small class="text-muted">Date: {{ event.start_date|date:"d/m/Y H:i" }}</small></p>
-                        <a href="{% url 'event_detail' event.id %}" class="btn btn-primary">Voir les détails</a>
+                        <div class="card-meta">
+                            <i class="fas fa-map-marker-alt"></i>
+                            <span>{{ event.location }}</span>
+                        </div>
+                        <div class="card-meta">
+                            <i class="fas fa-clock"></i>
+                            <span>{{ event.start_time|date:"H:i" }} - {{ event.end_time|date:"H:i" }}</span>
+                        </div>
+                        <div class="d-grid mt-3">
+                            <a href="{% url 'event_detail' event.id %}" class="btn btn-primary" aria-label="Voir les détails">Voir détails</a>
+                        </div>
                     </div>
                 </div>
             </div>

@@ -30,6 +30,22 @@ class CustomUser(AbstractUser):
     last_name = models.CharField(_('last name'), max_length=150)
     is_active = models.BooleanField(default=False)
     activation_token = models.CharField(max_length=100, blank=True)
+
+    # Override groups and user_permissions with custom related_names
+    groups = models.ManyToManyField(
+        'auth.Group',
+        verbose_name=_('groups'),
+        blank=True,
+        related_name='custom_user_set',
+        related_query_name='custom_user'
+    )
+    user_permissions = models.ManyToManyField(
+        'auth.Permission',
+        verbose_name=_('user permissions'),
+        blank=True,
+        related_name='custom_user_set',
+        related_query_name='custom_user'
+    )
     
     objects = CustomUserManager()
     
