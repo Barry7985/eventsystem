@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Gestion d'Événements{% endblock %}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <style>
+        .hero-section {
+            position: relative;
+            overflow: hidden;
+            padding: 80px 20px; /* Augmenter le padding pour plus d'espace vertical */
+            text-align: center;
+            background: url(' https://www.pexels.com/photo/people-working-on-laptops-during-a-meeting-3182812') center center no-repeat;
+            background-size: cover;
+        }
+        .hero-section::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5); /* Assombrir l'image de fond */
+        }
+        .hero-content {
+            position: relative; /* Assure que le contenu est au-dessus de la superposition */
+            color: white;
+            padding: 2rem;
+        }
+        .hero-title {
+            font-size: 3.5rem; /* Ajuster la taille du titre */
+            font-weight: bold;
+            margin-bottom: 1rem;
+        }
+        .hero-subtitle {
+            font-size: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        .hero-button {
+            padding: 0.75rem 2rem;
+            font-size: 1.25rem;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <div class="container">
+            <a class="navbar-brand" href="{% url 'event_list' %}">Gestion d'Événements</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'event_list' %}">Événements</a>
+                    </li>
+                    {% if user.is_authenticated %}
+                        {% if user.role == 'organizer' %}
+                            <li class="nav-item">
+                                <a class="nav-link" href="{% url 'organizer_dashboard' %}">Tableau de bord Organisateur</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="{% url 'event_create' %}">Créer un Événement</a>
+                            </li>
+                        {% endif %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'profile' %}">Mon Profil</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'logout' %}">Déconnexion</a>
+                        </li>
+                    {% else %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'login' %}">Connexion</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'register' %}">Inscription</a>
+                        </li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    {% if request.path == '/' or request.path == reverse('event_list') %}
+    <div class="hero-section">
+        <div class="hero-content">
+            <h1 class="hero-title">Découvrez des événements passionnants près de chez vous</h1>
+            <p class="hero-subtitle">Rejoignez des conférences, ateliers, concerts et bien plus encore. Trouvez l'événement parfait pour vous !</p>
+            <a class="btn btn-primary btn-lg hero-button" href="{% url 'event_list' %}">Explorer les événements</a>
+        </div>
+    </div>
+    {% endif %}
+
+    <div class="container mt-4">
+        {% block content %}
+            {% endblock %}
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
+    {% block extra_js %}
+        {% endblock %}
+</body>
+</html>

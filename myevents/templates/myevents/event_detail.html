@@ -1,0 +1,82 @@
+{% extends 'base.html' %}
+{% load humanize %}
+
+{% block title %}{{ event.title }}{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card shadow-lg">
+                {% if event.image %}
+                    <img src="{{ event.image.url }}" class="card-img-top" alt="{{ event.title }}">
+                {% else %}
+                    <img src="https://via.placeholder.com/800x400" class="card-img-top" alt="Image par défaut">
+                {% endif %}
+                <div class="card-body p-4">
+                    <h1 class="card-title">{{ event.title }}</h1>
+                    <p class="card-subtitle mb-3 text-muted">
+                        <i class="bi bi-calendar-event"></i> {{ event.start_date|date:"d F Y à H:i" }} - {{ event.end_date|date:"d F Y à H:i" }}
+                        <br>
+                        <i class="bi bi-geo-alt"></i> {{ event.location }}
+                        {% if event.category %}
+                            <br>
+                            <i class="bi bi-tags"></i> {{ event.category.name }}
+                        {% endif %}
+                    </p>
+                    <p class="card-text">{{ event.description|linebreaksbr }}</p>
+
+                    <div class="d-flex justify-content-between align-items-center mt-4">
+                        <div>
+                            {% if event.price > 0 %}
+                                <h4 class="mb-0">Prix: <span class="text-success">{{ event.price|intcomma }}</span></h4>
+                            {% else %}
+                                <h4 class="mb-0">Gratuit</h4>
+                            {% endif %}
+                            <small class="text-muted">Places disponibles: {{ event.capacity }}</small>
+                        </div>
+                        <div>
+                            {% if user.is_authenticated %}
+                                {% if not user.ticket_set.filter(event=event).exists %}
+                                    {% if event.capacity > event.ticket_set.count %}
+                                        {% if event.price > 0 %}
+                                            <a href="{% url 'initiate_payment' event.id %}" class="btn btn-primary btn-lg">Acheter un billet</a>
+                                        {% else %}
+                                            <a href="{% url 'event_register' event.id %}" class="btn btn-success btn-lg">S'inscrire</a>
+                                        {% endif %}
+                                    {% else %}
+                                        <button class="btn btn-secondary btn-lg" disabled>Événement complet</button>
+                                    {% endif %}
+                                {% else %}
+                                    <button class="btn btn-outline-success btn-lg" disabled>Déjà inscrit</button>
+                                {% endif %}
+                            {% else %}
+                                <a href="{% url 'login' %}" class="btn btn-outline-primary btn-lg">Se connecter pour s'inscrire</a>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4 mt-4 mt-lg-0">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title">Organisateur</h5>
+                    <div class="d-flex align-items-center">
+                        {% if event.organizer.profile_picture %}
+                            <img src="{{ event.organizer.profile_picture.url }}" alt="Photo de profil de {{ event.organizer.username }}" class="rounded-circle me-3" width="50" height="50">
+                        {% else %}
+                            <div class="bg-secondary rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 50px; height: 50px;">
+                                <span class="text-white fw-bold">{{ event.organizer.username|slice:":1|upper" }}</span>
+                            </div>
+                        {% endif %}
+                        <p class="mb-0">{{ event.organizer.first_name }} {{ event.organizer.last_name }} ({{ event.organizer.username }})</p>
+                    </div>
+                    <hr>
+                    <p class="card-text"><small class="text-muted">Cet événement est organisé par l'utilisateur ci-dessus.</small></p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

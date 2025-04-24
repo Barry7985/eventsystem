@@ -9,7 +9,7 @@ from .forms import EventCreationForm, EventUpdateForm, CategoryForm
 
 class EventListView(generic.ListView):
     model = Event
-    template_name = 'event/event_list.html'
+    template_name = 'myevents/event_list.html'
     paginate_by = 10
 
     def get_queryset(self):
@@ -28,9 +28,14 @@ class EventListView(generic.ListView):
         context['categories'] = Category.objects.all()
         return context
 
+
 class EventDetailView(generic.DetailView):
     model = Event
-    template_name = 'event/event_detail.html'
+    template_name = 'myevents/event_detail.html'
+    context_object_name = 'event'
+
+    def get_queryset(self):
+        return Event.objects.filter(is_public=True)
 
 @login_required
 def event_register(request, pk):
@@ -40,7 +45,7 @@ def event_register(request, pk):
         return redirect('event_detail', pk=pk)
     else:
         # Gérer le cas où l'événement est complet
-        return render(request, 'event/event_full.html', {'event': event})
+        return render(request, 'myevents/event_full.html', {'event': event})
 
 class OrganizerRequiredMixin(LoginRequiredMixin, UserPassesTestMixin):
     def test_func(self):
@@ -49,7 +54,7 @@ class OrganizerRequiredMixin(LoginRequiredMixin, UserPassesTestMixin):
 class EventCreateView(OrganizerRequiredMixin, generic.CreateView):
     model = Event
     form_class = EventCreationForm
-    template_name = 'event/event_form.html'
+    template_name = 'myevents/event_form.html'
     success_url = '/organizer/dashboard/'  # Rediriger vers le tableau de bord
 
     def form_valid(self, form):
@@ -84,7 +89,7 @@ def event_participants(request, pk):
     event = get_object_or_404(Event, pk=pk, organizer=request.user)
     participants = Ticket.objects.filter(event=event).select_related('user')
     context = {'event': event, 'participants': participants}
-    return render(request, 'event/event_participants.html', context)
+    return render(request, 'myevents/event_participants.html', context)
 
 @login_required
 def create_category(request):
@@ -95,4 +100,4 @@ def create_category(request):
             return redirect('event_list')  # Ou une autre page appropriée
     else:
         form = CategoryForm()
-    return render(request, 'event/create_category.html', {'form': form})
+    return render(request, 'myevents/create_category.html', {'form': form})
