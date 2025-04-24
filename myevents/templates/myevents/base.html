@@ -10,7 +10,7 @@
     <link rel="stylesheet" href="{% static 'myevents/style.css' %}">
 </head>
 <body>
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top">
+    <nav class="navbar navbar-expand-lg navbar-light sticky-top">
         <div class="container">
             <a class="navbar-brand" href="{% url 'event_list' %}" aria-label="Gestion d'Événements">
                 <i class="fas fa-calendar-alt me-2"></i> EventHub
@@ -26,10 +26,21 @@
                     <li class="nav-item">
                         <a class="nav-link" href="{% url 'event_list' %}">Événements</a>
                     </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">Catégories</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% if user.is_authenticated %}{% url 'organisateurs' %}{% else %}{% url 'login' %}{% endif %}" aria-label="Organisateurs">
+                            Organisateurs
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">Contact</a>
+                    </li>
                 </ul>
                 <div class="d-flex">
                     {% if user.is_authenticated %}
-                        <a href="#" class="btn btn-outline-light me-2" aria-label="Mon Profil">
+                        <a href="#" class="btn btn-outline-primary me-2" aria-label="Mon Profil">
                             <i class="fas fa-user me-1"></i> Mon Profil
                         </a>
                         <form method="post" action="{% url 'logout' %}" class="d-inline">
@@ -39,7 +50,7 @@
                             </button>
                         </form>
                     {% else %}
-                        <a href="{% url 'login' %}" class="btn btn-outline-light me-2" aria-label="Se connecter">
+                        <a href="{% url 'login' %}" class="btn btn-outline-primary me-2" aria-label="Se connecter">
                             <i class="fas fa-sign-in-alt me-1"></i> Connexion
                         </a>
                         <a href="{% url 'register' %}" class="btn btn-primary" aria-label="S'inscrire">

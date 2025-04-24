@@ -29,10 +29,11 @@ a:focus, button:focus, input:focus, select:focus, textarea:focus {
 .navbar {
     padding: 1rem 0;
     box-shadow: var(--shadow-sm);
-    background-color: rgba(255, 255, 255, 0.95) !important;
+    background-color: rgba(255, 255, 255, 0.95); /* Light background */
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
 }
+
 .navbar-brand {
     font-weight: 700;
     color: var(--primary-color) !important;
@@ -385,6 +386,60 @@ a:focus, button:focus, input:focus, select:focus, textarea:focus {
     transform: translateY(-3px);
     box-shadow: var(--shadow-md);
 }
+.login-container {
+    max-width: 450px;
+    margin: 5rem auto;
+    padding: 2rem;
+    background-color: white;
+    border-radius: 12px;
+    box-shadow: var(--shadow-lg);
+    animation: fadeInUp 0.8s ease-out;
+}
+.login-title {
+    font-size: 2rem;
+    font-weight: 700;
+    margin-bottom: 1.5rem;
+    text-align: center;
+}
+.form-control {
+    height: 50px;
+    border-radius: 50px;
+    padding-left: 1.5rem;
+    font-size: 1rem;
+    border: 1px solid #e0e0e0;
+    transition: var(--transition);
+}
+.form-control:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 0.2rem rgba(67, 97, 238, 0.25);
+}
+.btn-primary {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+    padding: 0.6rem 1.5rem;
+    border-radius: 50px;
+    font-weight: 500;
+    transition: var(--transition);
+}
+.btn-primary:hover {
+    background-color: var(--dark-color);
+    border-color: var(--dark-color);
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-md);
+}
+.login-footer {
+    margin-top: 1.5rem;
+    text-align: center;
+    font-size: 0.9rem;
+}
+.login-footer a {
+    color: var(--primary-color);
+    text-decoration: none;
+    transition: var(--transition);
+}
+.login-footer a:hover {
+    text-decoration: underline;
+}
 /* Categories Section */
 .categories-section {
     background-color: white;
@@ -573,6 +628,114 @@ footer::before {
     padding-top: 2rem;
     margin-top: 3rem;
 }
+.login-container {
+    max-width: 450px;
+    margin: 5rem auto;
+    padding: 2rem;
+    background-color: white;
+    border-radius: 12px;
+    box-shadow: var(--shadow-lg);
+    animation: fadeInUp 0.8s ease-out;
+}
+.login-title {
+    font-size: 2rem;
+    font-weight: 700;
+    margin-bottom: 1.5rem;
+    text-align: center;
+}
+.form-control {
+    height: 50px;
+    border-radius: 50px;
+    padding-left: 1.5rem;
+    font-size: 1rem;
+    border: 1px solid #e0e0e0;
+    transition: var(--transition);
+}
+.form-control:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 0.2rem rgba(67, 97, 238, 0.25);
+}
+.btn-primary {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+    padding: 0.6rem 1.5rem;
+    border-radius: 50px;
+    font-weight: 500;
+    transition: var(--transition);
+}
+.btn-primary:hover {
+    background-color: var(--dark-color);
+    border-color: var(--dark-color);
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-md);
+}
+.login-footer {
+    margin-top: 1.5rem;
+    text-align: center;
+    font-size: 0.9rem;
+}
+.login-footer a {
+    color: var(--primary-color);
+    text-decoration: none;
+    transition: var(--transition);
+}
+.login-footer a:hover {
+    text-decoration: underline;
+}
+.register-container {
+    max-width: 450px;
+    margin: 5rem auto;
+    padding: 2rem;
+    background-color: white;
+    border-radius: 12px;
+    box-shadow: var(--shadow-lg);
+    animation: fadeInUp 0.8s ease-out;
+}
+.register-title {
+    font-size: 2rem;
+    font-weight: 700;
+    margin-bottom: 1.5rem;
+    text-align: center;
+}
+.form-control {
+    height: 50px;
+    border-radius: 50px;
+    padding-left: 1.5rem;
+    font-size: 1rem;
+    border: 1px solid #e0e0e0;
+    transition: var(--transition);
+}
+.form-control:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 0.2rem rgba(67, 97, 238, 0.25);
+}
+.btn-primary {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+    padding: 0.6rem 1.5rem;
+    border-radius: 50px;
+    font-weight: 500;
+    transition: var(--transition);
+}
+.btn-primary:hover {
+    background-color: var(--dark-color);
+    border-color: var(--dark-color);
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-md);
+}
+.register-footer {
+    margin-top: 1.5rem;
+    text-align: center;
+    font-size: 0.9rem;
+}
+.register-footer a {
+    color: var(--primary-color);
+    text-decoration: none;
+    transition: var(--transition);
+}
+.register-footer a:hover {
+    text-decoration: underline;
+}
 /* Animations */
 @keyframes fadeInUp {
     from {
@@ -584,6 +747,7 @@ footer::before {
         transform: translateY(0);
     }
 }
+
 @keyframes float {
     0% { transform: translateY(0px); }
     50% { transform: translateY(-10px); }

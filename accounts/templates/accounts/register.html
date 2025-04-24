@@ -1,105 +1,53 @@
-{% load static %}
-
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}DIOULDE - Hôtel & Réservations{% endblock %}</title>
-
-    <!-- Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
-
-    <!-- Bootstrap Icons -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-    <style>
-        /* Styles globaux */
-        body {
-            background-color: #f8f9fa;
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .main-content {
-            flex: 1 0 auto;
-        }
-
-        .navbar-brand {
-            font-weight: bold;
-        }
-
-        .card {
-            border-radius: 15px;
-            border: none;
-        }
-
-        .btn-primary {
-            padding: 0.8rem 1.5rem;
-            border-radius: 8px;
-        }
-
-        .form-control {
-            padding: 0.8rem 1rem;
-            border-radius: 8px;
-        }
-        </style>
-</head>
-
-<body>
-<div class="container mt-5">
-    <div class="row justify-content-center">
-        <div class="col-md-6">
-            <div class="card shadow">
-                <div class="card-body">
-                    <h2 class="text-center mb-4">Inscription</h2>
-                    {% if messages %}
-                        {% for message in messages %}
-                            <div class="alert alert-{{ message.tags }}">
-                                {{ message }}
-                            </div>
-                        {% endfor %}
-                    {% endif %}
-                    <form method="post">
-                        {% csrf_token %}
-                        <div class="mb-3">
-                            <label for="first_name" class="form-label">Prénom</label>
-                            {{ form.first_name.errors }}
-                            <input type="text" name="first_name" class="form-control" id="first_name" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="last_name" class="form-label">Nom</label>
-                            {{ form.last_name.errors }}
-                            <input type="text" name="last_name" class="form-control" id="last_name" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="email" class="form-label">Email</label>
-                            {{ form.email.errors }}
-                            <input type="email" name="email" class="form-control" id="email" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="password1" class="form-label">Mot de passe</label>
-                            {{ form.password1.errors }}
-                            <input type="password" name="password1" class="form-control" id="password1" required>
-                            <small class="form-text text-muted">
-                                Le mot de passe doit contenir au moins 8 caractères.
-                            </small>
-                        </div>
-                        <div class="mb-3">
-                            <label for="password2" class="form-label">Confirmer le mot de passe</label>
-                            {{ form.password2.errors }}
-                            <input type="password" name="password2" class="form-control" id="password2" required>
-                        </div>
-                        <div class="d-grid gap-2">
-                            <button type="submit" class="btn btn-primary">S'inscrire</button>
-                        </div>
-                    </form>
-                    <div class="text-center mt-3">
-                        <p>Déjà inscrit? <a href="{% url 'login' %}">Se connecter</a></p>
-                    </div>
-                </div>
+{% extends 'accounts/base.html' %}
+{% block content %}
+ <!-- Registration Section -->
+ <div class="register-container animate fadeInUp">
+    <h2 class="register-title">Inscription</h2>
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }}">
+                {{ message }}
             </div>
+        {% endfor %}
+    {% endif %}
+    <form action="{% url 'register' %}" method="post">
+        {% csrf_token %}
+        <div class="mb-3">
+            <label for="first_name" class="form-label">Prénom</label>
+            {{ form.first_name.errors }}
+            <input type="text" name="first_name" class="form-control" id="first_name" placeholder="Entrez votre prénom" required>
         </div>
+        <div class="mb-3">
+            <label for="last_name" class="form-label">Nom</label>
+            {{ form.last_name.errors }}
+            <input type="text" name="last_name" class="form-control" id="last_name" placeholder="Entrez votre nom" required>
+        </div>
+        <div class="mb-3">
+            <label for="email" class="form-label">Email</label>
+            {{ form.email.errors }}
+            <input type="email" name="email" class="form-control" id="email" placeholder="Entrez votre email" required>
+        </div>
+        <div class="mb-3">
+            <label for="password1" class="form-label">Mot de passe</label>
+            {{ form.password1.errors }}
+            <input type="password" name="password1" class="form-control" id="password1" placeholder="Choisissez un mot de passe" required>
+            <small class="form-text text-muted">
+                Le mot de passe doit contenir au moins 8 caractères.
+            </small>
+        </div>
+        <div class="mb-3">
+            <label for="password2" class="form-label">Confirmer le mot de passe</label>
+            {{ form.password2.errors }}
+            <input type="password" name="password2" class="form-control" id="password2" placeholder="Confirmez votre mot de passe" required>
+        </div>
+        <div class="d-grid">
+            <button type="submit" class="btn btn-primary">S'inscrire</button>
+        </div>
+    </form>
+    <div class="register-footer">
+        Déjà inscrit ? <a href="{% url 'login' %}">Se connecter ici</a>
     </div>
 </div>
-</body>
+{% endblock %}
+
+
