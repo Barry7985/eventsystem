@@ -30,7 +30,7 @@
                         <a class="nav-link" href="#">Catégories</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{% if user.is_authenticated %}{% url 'organisateurs' %}{% else %}{% url 'login' %}{% endif %}" aria-label="Organisateurs">
+                        <a class="nav-link" href="{% if user.is_authenticated %}{% url 'myevents:organizer_dashboard' %}{% else %}{% url 'login' %}{% endif %}" aria-label="Organisateurs">
                             Organisateurs
                         </a>
                     </li>

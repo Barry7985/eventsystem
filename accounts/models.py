@@ -21,15 +21,26 @@ class CustomUserManager(BaseUserManager):
         extra_fields.setdefault('is_staff', True)
         extra_fields.setdefault('is_superuser', True)
         extra_fields.setdefault('is_active', True)
+        extra_fields.setdefault('role', 'admin')
         return self.create_user(email, password, **extra_fields)
 
 class CustomUser(AbstractUser):
+    ROLE_CHOICES = [
+        ('user', 'User'),
+        ('organizer', 'Organizer'),
+        ('admin', 'Admin'),
+    ]
+
     username = None
     email = models.EmailField(_('email address'), unique=True)
     first_name = models.CharField(_('first name'), max_length=150)
     last_name = models.CharField(_('last name'), max_length=150)
     is_active = models.BooleanField(default=False)
     activation_token = models.CharField(max_length=100, blank=True)
+    role = models.CharField(max_length=20, choices=ROLE_CHOICES, default='user')
+    phone_number = models.CharField(max_length=15, blank=True)
+    address = models.TextField(blank=True)
+    profile_picture = models.ImageField(upload_to='profile_pics/', blank=True, null=True)
 
     # Override groups and user_permissions with custom related_names
     groups = models.ManyToManyField(
@@ -50,7 +61,11 @@ class CustomUser(AbstractUser):
     objects = CustomUserManager()
     
     USERNAME_FIELD = 'email'
-    REQUIRED_FIELDS = ['first_name', 'last_name']  # Ajout des champs obligatoires
+    REQUIRED_FIELDS = ['first_name', 'last_name']
 
     def get_full_name(self):
         return f"{self.first_name} {self.last_name}"
+
+    @property
+    def is_organizer(self):
+        return self.role == 'organizer'

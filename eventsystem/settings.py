@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 
 from pathlib import Path
+import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -37,6 +38,17 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.sites',
+    
+    # Third party apps
+    'crispy_forms',
+    'crispy_bootstrap5',
+    'allauth',
+    'allauth.account',
+    'allauth.socialaccount',
+    'widget_tweaks',
+    
+    # Local apps
     'accounts',
     'myevents',
     'payment',
@@ -50,6 +62,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'allauth.account.middleware.AccountMiddleware',
 ]
 
 ROOT_URLCONF = 'eventsystem.urls'
@@ -57,7 +70,7 @@ ROOT_URLCONF = 'eventsystem.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [os.path.join(BASE_DIR, 'templates')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -103,6 +116,10 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 
+# Custom user model
+AUTH_USER_MODEL = 'accounts.CustomUser'
+
+
 # Internationalization
 # https://docs.djangoproject.com/en/5.1/topics/i18n/
 
@@ -119,8 +136,43 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 
 STATIC_URL = 'static/'
+STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+
+# Media files
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# Crispy Forms
+CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
+CRISPY_TEMPLATE_PACK = "bootstrap5"
+
+# Django AllAuth
+AUTHENTICATION_BACKENDS = [
+    'django.contrib.auth.backends.ModelBackend',
+    'allauth.account.auth_backends.AuthenticationBackend',
+]
+
+SITE_ID = 1
+
+ACCOUNT_LOGIN_METHODS = {'email'}
+ACCOUNT_SIGNUP_FIELDS = ['email*', 'password1*', 'password2*']
+ACCOUNT_EMAIL_VERIFICATION = 'mandatory'
+
+# Email settings (for development)
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+
+# Login/Logout URLs
+LOGIN_REDIRECT_URL = 'home'
+LOGOUT_REDIRECT_URL = 'home'
+LOGIN_URL = 'account_login'
+
+# Stripe settings
+STRIPE_PUBLISHABLE_KEY = 'your_publishable_key'
+STRIPE_SECRET_KEY = 'your_secret_key'
+STRIPE_WEBHOOK_SECRET = 'your_webhook_secret'

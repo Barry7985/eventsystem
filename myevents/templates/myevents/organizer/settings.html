@@ -1,0 +1,217 @@
+{% extends 'myevents/organizer/base.html' %}
+
+{% block title %}Paramètres - {{ event.title }}{% endblock %}
+
+{% block organizer_content %}
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+    <h1 class="h2">Paramètres - {{ event.title }}</h1>
+    <div class="btn-toolbar mb-2 mb-md-0">
+        <a href="{% url 'myevents:organizer_dashboard' %}" class="btn btn-sm btn-outline-primary">
+            <i class="fas fa-arrow-left"></i> Retour au tableau de bord
+        </a>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Event Settings -->
+    <div class="col-md-8">
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="card-title mb-0">Paramètres de l'événement</h5>
+            </div>
+            <div class="card-body">
+                <form method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    
+                    <div class="mb-3">
+                        <label for="title" class="form-label">Titre de l'événement</label>
+                        <input type="text" class="form-control" id="title" name="title" value="{{ event.title }}" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="description" class="form-label">Description</label>
+                        <textarea class="form-control" id="description" name="description" rows="4" required>{{ event.description }}</textarea>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="start_date" class="form-label">Date de début</label>
+                                <input type="date" class="form-control" id="start_date" name="start_date" value="{{ event.start_date|date:'Y-m-d' }}" required>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="start_time" class="form-label">Heure de début</label>
+                                <input type="time" class="form-control" id="start_time" name="start_time" value="{{ event.start_date|time:'H:i' }}" required>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="end_date" class="form-label">Date de fin</label>
+                                <input type="date" class="form-control" id="end_date" name="end_date" value="{{ event.end_date|date:'Y-m-d' }}" required>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="end_time" class="form-label">Heure de fin</label>
+                                <input type="time" class="form-control" id="end_time" name="end_time" value="{{ event.end_date|time:'H:i' }}" required>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="location" class="form-label">Lieu</label>
+                        <input type="text" class="form-control" id="location" name="location" value="{{ event.location }}" required>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="capacity" class="form-label">Capacité</label>
+                                <input type="number" class="form-control" id="capacity" name="capacity" value="{{ event.capacity }}" required>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="price" class="form-label">Prix du billet (€)</label>
+                                <input type="number" class="form-control" id="price" name="price" value="{{ event.price }}" step="0.01" required>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="category" class="form-label">Catégorie</label>
+                        <select class="form-select" id="category" name="category" required>
+                            {% for category in categories %}
+                            <option value="{{ category.id }}" {% if category.id == event.category.id %}selected{% endif %}>
+                                {{ category.name }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="image" class="form-label">Image de l'événement</label>
+                        <input type="file" class="form-control" id="image" name="image" accept="image/*">
+                        {% if event.image %}
+                        <div class="mt-2">
+                            <img src="{{ event.image.url }}" alt="{{ event.title }}" class="img-thumbnail" style="max-height: 200px;">
+                        </div>
+                        {% endif %}
+                    </div>
+
+                    <div class="mb-3 form-check">
+                        <input type="checkbox" class="form-check-input" id="is_public" name="is_public" {% if event.is_public %}checked{% endif %}>
+                        <label class="form-check-label" for="is_public">Événement public</label>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary">Enregistrer les modifications</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notification Settings -->
+    <div class="col-md-4">
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="card-title mb-0">Paramètres de notification</h5>
+            </div>
+            <div class="card-body">
+                <form method="post" action="{% url 'myevents:notification_settings' event.id %}">
+                    {% csrf_token %}
+                    
+                    <div class="mb-3 form-check">
+                        <input type="checkbox" class="form-check-input" id="notify_new_registration" name="notify_new_registration" {% if notification_settings.notify_new_registration %}checked{% endif %}>
+                        <label class="form-check-label" for="notify_new_registration">Nouvelles inscriptions</label>
+                    </div>
+
+                    <div class="mb-3 form-check">
+                        <input type="checkbox" class="form-check-input" id="notify_payment" name="notify_payment" {% if notification_settings.notify_payment %}checked{% endif %}>
+                        <label class="form-check-label" for="notify_payment">Paiements reçus</label>
+                    </div>
+
+                    <div class="mb-3 form-check">
+                        <input type="checkbox" class="form-check-input" id="notify_cancellation" name="notify_cancellation" {% if notification_settings.notify_cancellation %}checked{% endif %}>
+                        <label class="form-check-label" for="notify_cancellation">Annulations</label>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="notification_email" class="form-label">Email de notification</label>
+                        <input type="email" class="form-control" id="notification_email" name="notification_email" value="{{ notification_settings.notification_email }}" required>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary">Enregistrer les préférences</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Danger Zone -->
+        <div class="card border-danger">
+            <div class="card-header bg-danger text-white">
+                <h5 class="card-title mb-0">Zone dangereuse</h5>
+            </div>
+            <div class="card-body">
+                <div class="d-grid gap-2">
+                    <button type="button" class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#cancelEventModal">
+                        <i class="fas fa-ban"></i> Annuler l'événement
+                    </button>
+                    <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteEventModal">
+                        <i class="fas fa-trash"></i> Supprimer l'événement
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Cancel Event Modal -->
+<div class="modal fade" id="cancelEventModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Annuler l'événement</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>Êtes-vous sûr de vouloir annuler cet événement ? Cette action est irréversible.</p>
+                <p class="text-danger">Tous les participants seront notifiés de l'annulation.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
+                <form method="post" action="{% url 'myevents:event_cancel' event.id %}" class="d-inline">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-warning">Confirmer l'annulation</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Event Modal -->
+<div class="modal fade" id="deleteEventModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Supprimer l'événement</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>Êtes-vous sûr de vouloir supprimer cet événement ? Cette action est irréversible.</p>
+                <p class="text-danger">Toutes les données associées seront définitivement supprimées.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
+                <form method="post" action="{% url 'myevents:event_delete' event.id %}" class="d-inline">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger">Confirmer la suppression</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

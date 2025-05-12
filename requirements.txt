@@ -1,5 +1,11 @@
 asgiref==3.8.1
+colorama==0.4.6
+crispy-bootstrap5==2025.4
 Django==5.1.6
+django-allauth==65.8.0
+django-crispy-forms==2.4
+django-widget-tweaks==1.5.0
 pillow==11.2.1
+qrcode==8.2
 sqlparse==0.5.3
 tzdata==2025.1

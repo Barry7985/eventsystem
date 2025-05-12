@@ -1,0 +1,176 @@
+{% extends 'myevents/organizer/base.html' %}
+
+{% block title %}Participants - {{ event.title }}{% endblock %}
+
+{% block organizer_content %}
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+    <h1 class="h2">Participants - {{ event.title }}</h1>
+    <div class="btn-toolbar mb-2 mb-md-0">
+        <div class="btn-group me-2">
+            <a href="{% url 'myevents:export_participants_csv' event.pk %}" class="btn btn-sm btn-outline-secondary">
+                <i class="fas fa-file-csv"></i> Exporter CSV
+            </a>
+            <a href="{% url 'myevents:export_participants_pdf' event.pk %}" class="btn btn-sm btn-outline-secondary">
+                <i class="fas fa-file-pdf"></i> Exporter PDF
+            </a>
+        </div>
+        <a href="{% url 'myevents:organizer_dashboard' %}" class="btn btn-sm btn-outline-primary">
+            <i class="fas fa-arrow-left"></i> Retour au tableau de bord
+        </a>
+    </div>
+</div>
+
+<!-- Event Summary -->
+<div class="card mb-4">
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-3">
+                <p class="mb-2">
+                    <i class="fas fa-calendar text-primary"></i>
+                    {{ event.start_date|date:"d M Y" }}
+                </p>
+            </div>
+            <div class="col-md-3">
+                <p class="mb-2">
+                    <i class="fas fa-clock text-primary"></i>
+                    {{ event.start_date|time:"H:i" }} - {{ event.end_date|time:"H:i" }}
+                </p>
+            </div>
+            <div class="col-md-3">
+                <p class="mb-2">
+                    <i class="fas fa-map-marker-alt text-primary"></i>
+                    {{ event.location }}
+                </p>
+            </div>
+            <div class="col-md-3">
+                <p class="mb-2">
+                    <i class="fas fa-ticket-alt text-primary"></i>
+                    {{ event.tickets.filter.status='confirmed'|length }} / {{ event.capacity }} billets vendus
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Participants Table -->
+<div class="card">
+    <div class="card-body">
+        {% if participants %}
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>Nom</th>
+                        <th>Email</th>
+                        <th>Statut du billet</th>
+                        <th>Date d'achat</th>
+                        <th>Statut du paiement</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for ticket in participants %}
+                    <tr>
+                        <td>
+                            {% if ticket.user.get_full_name %}
+                            {{ ticket.user.get_full_name }}
+                            {% else %}
+                            {{ ticket.user.email }}
+                            {% endif %}
+                        </td>
+                        <td>{{ ticket.user.email }}</td>
+                        <td>
+                            <span class="badge {% if ticket.status == 'confirmed' %}bg-success{% elif ticket.status == 'pending' %}bg-warning{% else %}bg-danger{% endif %}">
+                                {{ ticket.status|title }}
+                            </span>
+                        </td>
+                        <td>{{ ticket.created_at|date:"d M Y" }}</td>
+                        <td>
+                            {% if ticket.is_paid %}
+                            <span class="badge bg-success">Payé</span>
+                            {% else %}
+                            <span class="badge bg-warning">En attente</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <div class="btn-group">
+                                <button type="button" class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#ticketModal{{ ticket.pk }}">
+                                    <i class="fas fa-ticket-alt"></i> Voir le billet
+                                </button>
+                                {% if ticket.qr_code %}
+                                <a href="{{ ticket.qr_code.url }}" class="btn btn-sm btn-outline-secondary" download>
+                                    <i class="fas fa-download"></i> QR Code
+                                </a>
+                                {% endif %}
+                            </div>
+                        </td>
+                    </tr>
+
+                    <!-- Ticket Modal -->
+                    <div class="modal fade" id="ticketModal{{ ticket.pk }}" tabindex="-1">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title">Détails du billet</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <div class="text-center mb-3">
+                                        {% if ticket.qr_code %}
+                                        <img src="{{ ticket.qr_code.url }}" alt="QR Code du billet" class="img-fluid mb-3" style="max-width: 200px;">
+                                        {% endif %}
+                                        <h6>Billet #{{ ticket.ticket_number }}</h6>
+                                    </div>
+                                    <dl class="row">
+                                        <dt class="col-sm-4">Événement</dt>
+                                        <dd class="col-sm-8">{{ event.title }}</dd>
+
+                                        <dt class="col-sm-4">Participant</dt>
+                                        <dd class="col-sm-8">
+                                            {% if ticket.user.get_full_name %}
+                                            {{ ticket.user.get_full_name }}
+                                            {% else %}
+                                            {{ ticket.user.email }}
+                                            {% endif %}
+                                        </dd>
+
+                                        <dt class="col-sm-4">Date</dt>
+                                        <dd class="col-sm-8">{{ event.start_date|date:"d M Y" }}</dd>
+
+                                        <dt class="col-sm-4">Heure</dt>
+                                        <dd class="col-sm-8">{{ event.start_date|time:"H:i" }} - {{ event.end_date|time:"H:i" }}</dd>
+
+                                        <dt class="col-sm-4">Lieu</dt>
+                                        <dd class="col-sm-8">{{ event.location }}</dd>
+
+                                        <dt class="col-sm-4">Statut</dt>
+                                        <dd class="col-sm-8">
+                                            <span class="badge {% if ticket.status == 'confirmed' %}bg-success{% elif ticket.status == 'pending' %}bg-warning{% else %}bg-danger{% endif %}">
+                                                {{ ticket.status|title }}
+                                            </span>
+                                        </dd>
+                                    </dl>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
+                                    {% if ticket.qr_code %}
+                                    <a href="{{ ticket.qr_code.url }}" class="btn btn-primary" download>
+                                        <i class="fas fa-download"></i> Télécharger QR Code
+                                    </a>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="alert alert-info">
+            Aucun participant n'a encore enregistré pour cet événement.
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %} 

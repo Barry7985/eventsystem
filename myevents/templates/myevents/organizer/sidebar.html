@@ -1,0 +1,81 @@
+{% load static %}
+
+<aside class="col-md-3 col-lg-2 d-md-block bg-dark sidebar collapse">
+    <div class="position-sticky pt-3">
+        <div class="sidebar-brand mb-4">
+            <i class="fas fa-calendar-alt"></i> EventHub
+        </div>
+        <ul class="nav flex-column">
+            <li class="nav-item">
+                <a class="nav-link text-white {% if request.resolver_match.url_name == 'organizer_dashboard' %}active{% endif %}" href="{% url 'myevents:organizer_dashboard' %}">
+                    <i class="fas fa-home"></i> Tableau de bord
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link text-white {% if request.resolver_match.url_name == 'event_create' %}active{% endif %}" href="{% url 'myevents:event_create' %}">
+                    <i class="fas fa-calendar-day"></i> Événements
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link text-white {% if request.resolver_match.url_name == 'event_list' %}active{% endif %}" href="{% url 'myevents:event_list' %}">
+                    <i class="fas fa-users"></i> Participants
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link text-white {% if request.resolver_match.url_name == 'event_statistics' %}active{% endif %}" href="{% url 'myevents:event_statistics' event.pk %}">
+                    <i class="fas fa-chart-bar"></i> Statistiques
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link text-white {% if request.resolver_match.url_name == 'event_settings' %}active{% endif %}" href="{% url 'myevents:event_settings' event.pk %}">
+                    <i class="fas fa-cog"></i> Paramètres
+                </a>
+            </li>
+        </ul>
+
+        {% if event %}
+        <!-- Event Quick Info -->
+        <div class="mt-4">
+            <h6 class="sidebar-heading text-white">
+                <i class="fas fa-info-circle"></i> Informations rapides
+            </h6>
+            <div class="text-white-50">
+                <p class="mb-2">
+                    <i class="fas fa-calendar"></i>
+                    {{ event.start_date|date:"d M Y" }}
+                </p>
+                <p class="mb-2">
+                    <i class="fas fa-clock"></i>
+                    {{ event.start_date|time:"H:i" }} - {{ event.end_date|time:"H:i" }}
+                </p>
+                <p class="mb-2">
+                    <i class="fas fa-map-marker-alt"></i>
+                    {{ event.location }}
+                </p>
+                <p class="mb-2">
+                    <i class="fas fa-ticket-alt"></i>
+                    {{ event.tickets.filter.status='confirmed'|length }} / {{ event.capacity }} billets vendus
+                </p>
+            </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="mt-4">
+            <h6 class="sidebar-heading text-white">
+                <i class="fas fa-bolt"></i> Actions rapides
+            </h6>
+            <div class="d-grid gap-2">
+                <a href="{% url 'myevents:event_participants' event.pk %}" class="btn btn-outline-light btn-sm">
+                    <i class="fas fa-users"></i> Gérer les participants
+                </a>
+                <a href="{% url 'myevents:export_participants_csv' event.pk %}" class="btn btn-outline-light btn-sm">
+                    <i class="fas fa-file-csv"></i> Exporter en CSV
+                </a>
+                <a href="{% url 'myevents:export_participants_pdf' event.pk %}" class="btn btn-outline-light btn-sm">
+                    <i class="fas fa-file-pdf"></i> Exporter en PDF
+                </a>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</aside> 

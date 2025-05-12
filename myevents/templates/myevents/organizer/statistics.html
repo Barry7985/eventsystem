@@ -1,0 +1,228 @@
+{% extends 'myevents/organizer/base.html' %}
+
+{% block title %}Statistiques - {{ event.title }}{% endblock %}
+
+{% block organizer_content %}
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+    <h1 class="h2">Statistiques - {{ event.title }}</h1>
+    <div class="btn-toolbar mb-2 mb-md-0">
+        <a href="{% url 'myevents:organizer_dashboard' %}" class="btn btn-sm btn-outline-primary">
+            <i class="fas fa-arrow-left"></i> Retour au tableau de bord
+        </a>
+    </div>
+</div>
+
+<!-- Event Summary -->
+<div class="card mb-4">
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-3">
+                <p class="mb-2">
+                    <i class="fas fa-calendar text-primary"></i>
+                    {{ event.start_date|date:"d M Y" }}
+                </p>
+            </div>
+            <div class="col-md-3">
+                <p class="mb-2">
+                    <i class="fas fa-clock text-primary"></i>
+                    {{ event.start_date|time:"H:i" }} - {{ event.end_date|time:"H:i" }}
+                </p>
+            </div>
+            <div class="col-md-3">
+                <p class="mb-2">
+                    <i class="fas fa-map-marker-alt text-primary"></i>
+                    {{ event.location }}
+                </p>
+            </div>
+            <div class="col-md-3">
+                <p class="mb-2">
+                    <i class="fas fa-ticket-alt text-primary"></i>
+                    {{ event.tickets.filter.status='confirmed'|length }} / {{ event.capacity }} billets vendus
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Statistics Cards -->
+<div class="row mb-4">
+    <div class="col-md-3">
+        <div class="card bg-primary text-white">
+            <div class="card-body">
+                <h5 class="card-title">Total des ventes</h5>
+                <h2 class="card-text">{{ total_sales }} €</h2>
+                <p class="card-text">
+                    <small>Basé sur {{ total_tickets }} billets vendus</small>
+                </p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card bg-success text-white">
+            <div class="card-body">
+                <h5 class="card-title">Taux de conversion</h5>
+                <h2 class="card-text">{{ conversion_rate }}%</h2>
+                <p class="card-text">
+                    <small>Visiteurs vers acheteurs</small>
+                </p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card bg-info text-white">
+            <div class="card-body">
+                <h5 class="card-title">Taux d'occupation</h5>
+                <h2 class="card-text">{{ occupancy_rate }}%</h2>
+                <p class="card-text">
+                    <small>Capacité utilisée</small>
+                </p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card bg-warning text-white">
+            <div class="card-body">
+                <h5 class="card-title">Prix moyen</h5>
+                <h2 class="card-text">{{ average_price }} €</h2>
+                <p class="card-text">
+                    <small>Par billet</small>
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Charts -->
+<div class="row">
+    <!-- Sales Over Time -->
+    <div class="col-md-6 mb-4">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Ventes dans le temps</h5>
+                <canvas id="salesChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- Ticket Status Distribution -->
+    <div class="col-md-6 mb-4">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Distribution des statuts</h5>
+                <canvas id="statusChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- Payment Methods -->
+    <div class="col-md-6 mb-4">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Méthodes de paiement</h5>
+                <canvas id="paymentChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- Geographic Distribution -->
+    <div class="col-md-6 mb-4">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Distribution géographique</h5>
+                <canvas id="geoChart"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+{{ block.super }}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    // Sales Over Time Chart
+    const salesCtx = document.getElementById('salesChart').getContext('2d');
+    new Chart(salesCtx, {
+        type: 'line',
+        data: {
+            labels: {{ sales_dates|safe }},
+            datasets: [{
+                label: 'Ventes',
+                data: {{ sales_data|safe }},
+                borderColor: 'rgb(75, 192, 192)',
+                tension: 0.1
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+
+    // Status Distribution Chart
+    const statusCtx = document.getElementById('statusChart').getContext('2d');
+    new Chart(statusCtx, {
+        type: 'doughnut',
+        data: {
+            labels: ['Confirmé', 'En attente', 'Annulé'],
+            datasets: [{
+                data: {{ status_data|safe }},
+                backgroundColor: [
+                    'rgb(40, 167, 69)',
+                    'rgb(255, 193, 7)',
+                    'rgb(220, 53, 69)'
+                ]
+            }]
+        },
+        options: {
+            responsive: true
+        }
+    });
+
+    // Payment Methods Chart
+    const paymentCtx = document.getElementById('paymentChart').getContext('2d');
+    new Chart(paymentCtx, {
+        type: 'pie',
+        data: {
+            labels: {{ payment_methods|safe }},
+            datasets: [{
+                data: {{ payment_data|safe }},
+                backgroundColor: [
+                    'rgb(54, 162, 235)',
+                    'rgb(255, 99, 132)',
+                    'rgb(255, 205, 86)'
+                ]
+            }]
+        },
+        options: {
+            responsive: true
+        }
+    });
+
+    // Geographic Distribution Chart
+    const geoCtx = document.getElementById('geoChart').getContext('2d');
+    new Chart(geoCtx, {
+        type: 'bar',
+        data: {
+            labels: {{ geo_locations|safe }},
+            datasets: [{
+                label: 'Participants',
+                data: {{ geo_data|safe }},
+                backgroundColor: 'rgb(153, 102, 255)'
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+</script>
+{% endblock %} 
