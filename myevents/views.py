@@ -3,6 +3,12 @@ from django.views import generic
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+from .utils.email import (
+    send_event_confirmation_email,
+    send_ticket_purchase_email,
+    send_event_reminder_email,
+    send_event_update_email
+)
 from django.db.models import Q, Sum
 from django.urls import reverse_lazy
 from django.contrib import messages
@@ -76,10 +82,15 @@ class EventDetailView(generic.DetailView):
 def event_register(request, pk):
     event = get_object_or_404(Event, pk=pk)
     if event.capacity > event.ticket_set.count():
-        Ticket.objects.get_or_create(user=request.user, event=event)
+        ticket, created = Ticket.objects.get_or_create(user=request.user, event=event)
+        if created:
+            # Send confirmation email
+            send_event_confirmation_email(request.user, event, ticket)
+            messages.success(request, 'Registration successful! Check your email for confirmation.')
         return redirect('event_detail', pk=pk)
     else:
         # Gérer le cas où l'événement est complet
+        messages.error(request, 'Sorry, this event is full.')
         return render(request, 'myevents/event_full.html', {'event': event})
 
 class OrganizerRequiredMixin(LoginRequiredMixin, UserPassesTestMixin):
@@ -111,8 +122,11 @@ class EventUpdateView(LoginRequiredMixin, UserPassesTestMixin, generic.UpdateVie
         return self.request.user == event.organizer
 
     def form_valid(self, form):
-        messages.success(self.request, 'Event updated successfully!')
-        return super().form_valid(form)
+        response = super().form_valid(form)
+        # Send update notification to all registered participants
+        send_event_update_email(self.object, update_type='modified')
+        messages.success(self.request, 'Event updated successfully! Participants have been notified.')
+        return response
 
 class EventDeleteView(LoginRequiredMixin, UserPassesTestMixin, generic.DeleteView):
     model = Event
@@ -124,7 +138,10 @@ class EventDeleteView(LoginRequiredMixin, UserPassesTestMixin, generic.DeleteVie
         return self.request.user == event.organizer
 
     def delete(self, request, *args, **kwargs):
-        messages.success(request, 'Event deleted successfully!')
+        event = self.get_object()
+        # Send cancellation notification to all registered participants
+        send_event_update_email(event, update_type='cancelled')
+        messages.success(request, 'Event cancelled successfully! Participants have been notified.')
         return super().delete(request, *args, **kwargs)
 
 @login_required
@@ -151,6 +168,9 @@ def purchase_ticket(request, pk):
                         amount=event.price,
                         payment_method='stripe'  # This will be updated with actual payment method
                     )
+                    # Send ticket purchase confirmation email
+                    send_ticket_purchase_email(request.user, ticket, payment)
+                    messages.success(request, 'Payment successful! Check your email for the ticket details.')
                     # Redirect to payment page
                     return redirect('payment_process', payment_id=payment.id)
                 else:

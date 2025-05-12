@@ -1,0 +1,41 @@
+{% extends "myevents/emails/base_email.html" %}
+
+{% block title %}Event Update{% endblock %}
+
+{% block content %}
+<p>Dear {{ user.get_full_name }},</p>
+
+{% if update_type == 'cancelled' %}
+    <p>Important: An event you are registered for has been cancelled:</p>
+{% else %}
+    <p>Important: There have been changes to an event you are registered for:</p>
+{% endif %}
+
+<div class="event-details">
+    <h2>{{ event.title }}</h2>
+    <p><strong>Date:</strong> {{ event.start_date|date:"F j, Y, g:i a" }}</p>
+    <p><strong>Location:</strong> {{ event.location }}</p>
+    <p><strong>Ticket Number:</strong> {{ ticket.ticket_number }}</p>
+    {% if update_type == 'cancelled' %}
+        <p><strong style="color: red;">Status: CANCELLED</strong></p>
+    {% endif %}
+</div>
+
+{% if update_type == 'cancelled' %}
+    <p>The event has been cancelled by the organizer. If you paid for this event, you will receive a refund within 5-7 business days.</p>
+{% else %}
+    <p>The event details have been updated. Please review the changes and make sure they work with your schedule.</p>
+{% endif %}
+
+<p>You can view the complete event details by clicking the button below:</p>
+
+<a href="{% url 'myevents:event_detail' event.id %}" class="button">View Event Details</a>
+
+{% if update_type != 'cancelled' %}
+    <p>If you can no longer attend due to these changes, you can cancel your registration through the event details page.</p>
+{% endif %}
+
+<p>If you have any questions, please don't hesitate to contact us.</p>
+
+<p>Best regards,<br>The Event System Team</p>
+{% endblock %}

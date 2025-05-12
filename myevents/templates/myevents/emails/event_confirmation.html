@@ -1,0 +1,32 @@
+{% extends "myevents/emails/base_email.html" %}
+
+{% block title %}Event Registration Confirmation{% endblock %}
+
+{% block content %}
+<p>Dear {{ user.get_full_name }},</p>
+
+<p>Thank you for registering for the following event:</p>
+
+<div class="event-details">
+    <h2>{{ event.title }}</h2>
+    <p><strong>Date:</strong> {{ event.start_date|date:"F j, Y, g:i a" }}</p>
+    <p><strong>Location:</strong> {{ event.location }}</p>
+    <p><strong>Ticket Number:</strong> {{ ticket.ticket_number }}</p>
+</div>
+
+<p>Your registration has been confirmed. Here are the important details:</p>
+
+<ul>
+    <li>Please arrive at least 15 minutes before the event starts</li>
+    <li>Bring your ticket (physical or digital) with the QR code</li>
+    <li>If you need to cancel, please do so at least 24 hours before the event</li>
+</ul>
+
+<p>You can view your ticket and event details by clicking the button below:</p>
+
+<a href="{% url 'myevents:event_detail' event.id %}" class="button">View Event Details</a>
+
+<p>If you have any questions, please don't hesitate to contact us.</p>
+
+<p>Best regards,<br>The Event System Team</p>
+{% endblock %}

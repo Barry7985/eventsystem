@@ -164,8 +164,22 @@ ACCOUNT_LOGIN_METHODS = {'email'}
 ACCOUNT_SIGNUP_FIELDS = ['email*', 'password1*', 'password2*']
 ACCOUNT_EMAIL_VERIFICATION = 'mandatory'
 
-# Email settings (for development)
-EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+# Email settings
+if DEBUG:
+    # Use console backend for development
+    EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+else:
+    # Use SMTP backend for production
+    EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+    EMAIL_HOST = 'smtp.gmail.com'  # Or your SMTP server
+    EMAIL_PORT = 587
+    EMAIL_USE_TLS = True
+    EMAIL_HOST_USER = 'your-email@gmail.com'  # Replace with your email
+    EMAIL_HOST_PASSWORD = 'your-app-password'  # Replace with your app password
+
+# Default email settings
+DEFAULT_FROM_EMAIL = 'Event System <noreply@eventsystem.com>'
+SERVER_EMAIL = 'server@eventsystem.com'
 
 # Login/Logout URLs
 LOGIN_REDIRECT_URL = 'home'

@@ -1,0 +1,35 @@
+{% extends "myevents/emails/base_email.html" %}
+
+{% block title %}Ticket Purchase Confirmation{% endblock %}
+
+{% block content %}
+<p>Dear {{ user.get_full_name }},</p>
+
+<p>Thank you for purchasing a ticket for:</p>
+
+<div class="event-details">
+    <h2>{{ event.title }}</h2>
+    <p><strong>Date:</strong> {{ event.start_date|date:"F j, Y, g:i a" }}</p>
+    <p><strong>Location:</strong> {{ event.location }}</p>
+    <p><strong>Ticket Number:</strong> {{ ticket.ticket_number }}</p>
+    <p><strong>Amount Paid:</strong> ${{ payment.amount }}</p>
+    <p><strong>Payment Reference:</strong> {{ payment.reference }}</p>
+</div>
+
+<p>Your ticket has been confirmed and paid for. Important information:</p>
+
+<ul>
+    <li>Save this email as your proof of purchase</li>
+    <li>Your QR code ticket is attached to this email</li>
+    <li>Present your QR code at the event entrance</li>
+    <li>Arrive at least 15 minutes before the event starts</li>
+</ul>
+
+<p>You can view your ticket details and download your QR code by clicking the button below:</p>
+
+<a href="{% url 'myevents:event_detail' event.id %}" class="button">View Ticket Details</a>
+
+<p>If you have any questions about your purchase, please contact us.</p>
+
+<p>Best regards,<br>The Event System Team</p>
+{% endblock %}

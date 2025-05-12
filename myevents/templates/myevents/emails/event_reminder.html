@@ -1,0 +1,33 @@
+{% extends "myevents/emails/base_email.html" %}
+
+{% block title %}Event Reminder{% endblock %}
+
+{% block content %}
+<p>Dear {{ user.get_full_name }},</p>
+
+<p>This is a friendly reminder that you are registered for an event tomorrow:</p>
+
+<div class="event-details">
+    <h2>{{ event.title }}</h2>
+    <p><strong>Date:</strong> {{ event.start_date|date:"F j, Y, g:i a" }}</p>
+    <p><strong>Location:</strong> {{ event.location }}</p>
+    <p><strong>Ticket Number:</strong> {{ ticket.ticket_number }}</p>
+</div>
+
+<p><strong>Important Reminders:</strong></p>
+
+<ul>
+    <li>Please arrive at least 15 minutes before the event starts</li>
+    <li>Don't forget to bring your ticket with the QR code</li>
+    <li>Check the weather forecast and dress appropriately</li>
+    <li>If you can no longer attend, please cancel your registration as soon as possible</li>
+</ul>
+
+<p>You can view the complete event details by clicking the button below:</p>
+
+<a href="{% url 'myevents:event_detail' event.id %}" class="button">View Event Details</a>
+
+<p>We look forward to seeing you tomorrow!</p>
+
+<p>Best regards,<br>The Event System Team</p>
+{% endblock %}
